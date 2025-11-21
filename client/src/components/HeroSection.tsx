@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Play } from "lucide-react";
 import TypingAnimation from "@/components/TypingAnimation";
-import RealTimeTracking from "./RealTimeTracking";
+import RealTimeTracking from "@/components/RealTimeTracking";
+
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted/20 py-20 md:py-28">
@@ -63,7 +64,10 @@ export default function HeroSection() {
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none"></div>
             </div>
 
-            <RealTimeTracking />
+            {/* Real-Time Container Tracking Section */}
+            <div className="mt-8">
+              <RealTimeTracking />
+            </div>
 
             {/* Decorative elements */}
             <div className="absolute -top-4 -right-4 h-72 w-72 rounded-full bg-primary/10 blur-3xl -z-10"></div>

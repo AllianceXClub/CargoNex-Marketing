@@ -4,10 +4,14 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Border Radius - Based on CargoNex Documentation */
+  --radius: 12px;
+  --radius-sm: 8.4px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 9999px;
+
+  /* Color Mappings */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -40,42 +44,82 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* WhatsApp Color - From Documentation */
+  --color-whatsapp: rgb(37, 211, 102);
+  --color-whatsapp-hover: rgb(32, 186, 90);
+
+  /* Spacing Scale - Based on Documentation */
+  --spacing-header-height: 65px;
+  --spacing-button-sm: 32px;
+  --spacing-button-md: 40px;
+  --spacing-button-lg: 48px;
+
+  /* Typography - From Documentation */
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 40px;
+  --font-size-5xl: 48px;
+
+  --line-height-xs: 16px;
+  --line-height-sm: 20px;
+  --line-height-base: 24px;
+  --line-height-lg: 28px;
+  --line-height-xl: 32px;
+  --line-height-2xl: 36px;
+  --line-height-3xl: 40px;
+  --line-height-4xl: 44px;
+  --line-height-5xl: 48px;
 }
 
 :root {
   /* TradeFlow AI Brand Colors - Red Primary */
-  --primary: #ea3b39; /* Red */
+  --primary: #ea3b39;
+  /* Red */
   --primary-foreground: #ffffff;
-  --primary-hover: #d32f2d; /* Darker Red */
-  --primary-light: #ffcdd2; /* Light Red */
-  
+  --primary-hover: #d32f2d;
+  /* Darker Red */
+  --primary-light: #ffcdd2;
+  /* Light Red */
+
   --sidebar-primary: #ea3b39;
   --sidebar-primary-foreground: oklch(0.99 0 0);
-  
+
   --chart-1: #ffcdd2;
   --chart-2: #ef5350;
   --chart-3: #ea3b39;
   --chart-4: #d32f2d;
   --chart-5: #c62828;
-  
+
   --radius: 0.65rem;
-  --background: oklch(1 0 0); /* Pure White */
-  --foreground: oklch(0.235 0.015 65); /* Dark Gray/Black */
+  --background: oklch(1 0 0);
+  /* Pure White */
+  --foreground: oklch(0.235 0.015 65);
+  /* Dark Gray/Black */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.235 0.015 65);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.235 0.015 65);
-  --secondary: oklch(0.98 0.001 286.375); /* Very Light Gray */
+  --secondary: oklch(0.98 0.001 286.375);
+  /* Very Light Gray */
   --secondary-foreground: oklch(0.4 0.015 65);
-  --muted: oklch(0.967 0.001 286.375); /* Light Gray #FAFAFA */
+  --muted: oklch(0.967 0.001 286.375);
+  /* Light Gray #FAFAFA */
   --muted-foreground: oklch(0.552 0.016 285.938);
   --accent: oklch(0.967 0.001 286.375);
   --accent-foreground: oklch(0.141 0.005 285.823);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32); /* #E0E0E0 */
+  --border: oklch(0.92 0.004 286.32);
+  /* #E0E0E0 */
   --input: oklch(0.92 0.004 286.32);
-  --ring: #ea3b39; /* Match primary */
+  --ring: #ea3b39;
+  /* Match primary */
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.235 0.015 65);
   --sidebar-accent: oklch(0.967 0.001 286.375);
@@ -85,7 +129,8 @@
 }
 
 .dark {
-  --primary: #ea3b39; /* Red */
+  --primary: #ea3b39;
+  /* Red */
   --primary-foreground: #ffffff;
   --sidebar-primary: #ea3b39;
   --sidebar-primary-foreground: oklch(0.99 0 0);
@@ -100,7 +145,7 @@
   --muted: oklch(0.274 0.006 286.033);
   --muted-foreground: oklch(0.705 0.015 286.067);
   --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
+  --accent-foreground: oklch(0.92 0.005 65);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
@@ -114,7 +159,7 @@
   --sidebar: oklch(0.21 0.006 285.885);
   --sidebar-foreground: oklch(0.85 0.005 65);
   --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: #ea3b39;
 }
@@ -123,16 +168,16 @@
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   html {
     direction: rtl;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Poppins', 'Heebo', 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
-  
+
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   [type="button"]:not(:disabled),
@@ -147,6 +192,7 @@
 }
 
 @layer components {
+
   /**
    * Custom container utility that centers content and adds responsive padding.
    * RTL-aware implementation for TradeFlow AI
@@ -155,30 +201,34 @@
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem;
+    /* 16px - mobile padding */
     padding-right: 1rem;
   }
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem;
+      /* 24px - tablet padding */
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem;
+      /* 32px - desktop padding */
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1280px;
+      /* Standard content width */
     }
   }
-  
+
   /* RTL-specific utilities */
   [dir="rtl"] .text-left {
     text-align: right;
   }
-  
+
   [dir="rtl"] .text-right {
     text-align: left;
   }
@@ -192,6 +242,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -202,6 +253,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -212,6 +264,7 @@
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -249,11 +302,13 @@ html {
 
 /* Hide scrollbar for horizontal scroll (mobile tabs) */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
+  display: none;
+  /* Chrome, Safari and Opera */
 }
-

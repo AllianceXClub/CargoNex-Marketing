@@ -14,11 +14,15 @@ import CookiePolicy from "./pages/legal/CookiePolicy";
 import BlogIndex from "./pages/blog/BlogIndex";
 import AiImportGuide2026 from "./pages/blog/posts/AiImportGuide2026";
 import MarketingGenerator from "./pages/MarketingGenerator";
+import DesignSystemShowcase from "./pages/DesignSystemShowcase";
+import DesignSystemTest from "./pages/DesignSystemTest";
+import TestPage from "./pages/TestPage";
 
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path="/" component={MarketingGenerator} />
+      <Route path="/home" component={Home} />
       <Route path={"/contact"} component={ContactPage} />
       <Route path={"/dashboard"} component={AgentDashboard} />
       <Route path={"/marketing-generator"} component={MarketingGenerator} />
@@ -27,6 +31,9 @@ function Router() {
       <Route path={"/legal/cookie-policy"} component={CookiePolicy} />
       <Route path={"/blog"} component={BlogIndex} />
       <Route path={"/blog/how-importers-israel-prepare-2026-ai-guide"} component={AiImportGuide2026} />
+      <Route path={"/design-system"} component={DesignSystemShowcase} />
+      <Route path={"/design-system-test"} component={DesignSystemTest} />
+      <Route path={"/test"} component={TestPage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
