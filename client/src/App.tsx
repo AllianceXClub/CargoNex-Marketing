@@ -1,5 +1,6 @@
 import { Switch, Route } from "wouter";
 import { Toaster } from "@/components/ui/sonner";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import MarketingGenerator from "./pages/MarketingGenerator";
 import NotFound from "./pages/NotFound";
 
@@ -17,6 +18,7 @@ function App() {
     <>
       <Router />
       <Toaster />
+      <SpeedInsights />
     </>
   );
 }
