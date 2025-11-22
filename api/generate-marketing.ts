@@ -1,29 +1,26 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-
+import { GoogleGenAI } from "@google/genai";
 
 export default async function handler(req: any, res: any) {
-  console.log("API Handler started"); // Debug log
+  console.log("API Handler started");
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    console.log("Parsing request body..."); // Debug log
+    console.log("Parsing request body...");
     const { topic } = req.body;
-    console.log(`Topic received: ${topic}`); // Debug log
+    console.log(`Topic received: ${topic}`);
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      console.error("GEMINI_API_KEY is missing in environment variables"); // Critical log
+      console.error("GEMINI_API_KEY is missing in environment variables");
       return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
     }
-    console.log("API Key found (length: " + apiKey.length + ")"); // Debug log
+    console.log("API Key found (length: " + apiKey.length + ")");
 
-    console.log("Initializing GoogleGenerativeAI..."); // Debug log
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    console.log("Initializing GoogleGenAI with v1 endpoint...");
+    const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
       You are an expert marketing strategist for Cargonex.io.
@@ -42,19 +39,21 @@ export default async function handler(req: any, res: any) {
       }
     `;
 
-    console.log("Sending request to Gemini..."); // Debug log
-    const result = await model.generateContent(prompt);
-    console.log("Gemini response received"); // Debug log
+    console.log("Sending request to Gemini 2.5 Flash...");
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
+    console.log("Gemini response received");
 
-    const response = await result.response;
-    const text = response.text();
-    console.log("Raw text response length: " + text.length); // Debug log
+    const text = response.text;
+    console.log("Raw text response length: " + text.length);
 
     // Attempt to parse JSON
     try {
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       const data = jsonMatch ? JSON.parse(jsonMatch[0]) : { raw_text: text };
-      console.log("JSON parsing successful"); // Debug log
+      console.log("JSON parsing successful");
       return res.status(200).json(data);
     } catch (parseError) {
       console.error("JSON Parsing failed:", parseError);
