@@ -43,16 +43,21 @@ export default async function handler(req: any, res: any) {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+      }
     });
     console.log("Gemini response received");
 
-    const text = response.text;
+    const text = response.text || "{}";
     console.log("Raw text response length: " + text.length);
 
     // Attempt to parse JSON
     try {
+      // With responseMimeType: "application/json", the text should be valid JSON directly.
+      // However, sometimes it might still be wrapped in markdown code blocks if the model ignores instructions slightly.
       const jsonMatch = text.match(/\{[\s\S]*\}/);
-      const data = jsonMatch ? JSON.parse(jsonMatch[0]) : { raw_text: text };
+      const data = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(text);
       console.log("JSON parsing successful");
       return res.status(200).json(data);
     } catch (parseError) {
