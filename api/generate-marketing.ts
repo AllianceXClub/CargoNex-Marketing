@@ -2,23 +2,17 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 
 
-export default async function handler(req: Request) {
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { topic } = await req.json();
+    const { topic } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'GEMINI_API_KEY not configured' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -62,15 +56,9 @@ export default async function handler(req: Request) {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const data = jsonMatch ? JSON.parse(jsonMatch[0]) : { raw_text: text };
 
-    return new Response(JSON.stringify(data), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(200).json(data);
   } catch (error: any) {
     console.error("Error generating content:", error);
-    return new Response(JSON.stringify({ error: error.message || "Failed to generate content" }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return res.status(500).json({ error: error.message || "Failed to generate content" });
   }
 }
