@@ -3,11 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Activity,
     Globe,
-    Box,
     Cpu,
     Zap,
     AlertCircle,
@@ -15,12 +13,13 @@ import {
     TrendingUp,
     Ship,
     Truck,
-    Plane,
-    Anchor
+    Plane
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { db } from "@/lib/firebase";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 
-// Mock Data for Charts
+// Mock Data for Charts (keeping this for visual flair as we don't have historical metrics yet)
 const performanceData = [
     { time: '08:00', efficiency: 65, tasks: 120 },
     { time: '09:00', efficiency: 72, tasks: 145 },
@@ -31,39 +30,75 @@ const performanceData = [
     { time: '14:00', efficiency: 94, tasks: 230 },
 ];
 
-// Mock Data for Live Feed
-const initialLogs = [
-    { id: 1, agent: 'RouteOptimizer', action: 'Rerouted Shipment #SH-902', reason: 'Weather Alert: Storm in Atlantic', time: 'Just now', status: 'success' },
-    { id: 2, agent: 'CustomsBot', action: 'Clearance Approved', reason: 'Doc #8821 Verified', time: '2 min ago', status: 'success' },
-    { id: 3, agent: 'InventoryAI', action: 'Low Stock Alert', reason: 'Warehouse B - SKU-112', time: '5 min ago', status: 'warning' },
-    { id: 4, agent: 'LogisticsCore', action: 'New Carrier Assigned', reason: 'Better rate found (-15%)', time: '12 min ago', status: 'info' },
-];
-
 export default function AgentDashboard() {
-    const [logs, setLogs] = useState(initialLogs);
-    const [activeAgents, setActiveAgents] = useState(12);
-    const [tasksProcessed, setTasksProcessed] = useState(12450);
+    const [logs, setLogs] = useState<any[]>([]);
+    const [activeCampaigns, setActiveCampaigns] = useState(0);
+    const [completedCampaigns, setCompletedCampaigns] = useState(0);
 
-    // Simulate live activity
     useEffect(() => {
-        const interval = setInterval(() => {
-            const actions = [
-                { agent: 'RouteOptimizer', action: 'Optimizing Route', reason: 'Traffic congestion detected', status: 'info' },
-                { agent: 'CustomsBot', action: 'Document Scan', reason: 'Verifying compliance', status: 'success' },
-                { agent: 'PriceWatcher', action: 'Rate Update', reason: 'Market fluctuation detected', status: 'warning' },
-            ];
-            const randomAction = actions[Math.floor(Math.random() * actions.length)];
-            const newLog = {
-                id: Date.now(),
-                ...randomAction,
-                time: 'Just now'
-            };
+        // Listen to the last 10 campaigns
+        const q = query(collection(db, "campaigns"), orderBy("createdAt", "desc"), limit(10));
 
-            setLogs(prev => [newLog, ...prev.slice(0, 9)]);
-            setTasksProcessed(prev => prev + Math.floor(Math.random() * 5));
-        }, 3000);
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const newLogs: any[] = [];
+            let activeCount = 0;
+            let completedCount = 0;
 
-        return () => clearInterval(interval);
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+
+                // Count stats
+                if (['RESEARCHING', 'DRAFTING', 'PUBLISHING', 'PENDING'].includes(data.status)) {
+                    activeCount++;
+                }
+                if (data.status === 'COMPLETED') {
+                    completedCount++;
+                }
+
+                // Create a log entry for the feed
+                let agentName = "System";
+                let action = "Campaign Update";
+                let statusColor = "info";
+
+                if (data.status === 'RESEARCHING') {
+                    agentName = "Strategist Agent";
+                    action = "Analyzing Trends";
+                    statusColor = "info";
+                } else if (data.status === 'DRAFTING') {
+                    agentName = "Creator Agent";
+                    action = "Drafting Content";
+                    statusColor = "warning"; // busy
+                } else if (data.status === 'PUBLISHING') {
+                    agentName = "Publisher Agent";
+                    action = "Finalizing Assets";
+                    statusColor = "warning";
+                } else if (data.status === 'COMPLETED') {
+                    agentName = "Publisher Agent";
+                    action = "Campaign Ready";
+                    statusColor = "success";
+                } else if (data.status === 'ERROR') {
+                    agentName = "System Alert";
+                    action = "Error Detected";
+                    statusColor = "error";
+                }
+
+                newLogs.push({
+                    id: doc.id,
+                    agent: agentName,
+                    action: action,
+                    reason: `Topic: ${data.topic}`,
+                    time: data.createdAt?.toDate().toLocaleTimeString() || "Just now",
+                    status: statusColor,
+                    rawStatus: data.status
+                });
+            });
+
+            setLogs(newLogs);
+            setActiveCampaigns(activeCount);
+            setCompletedCampaigns(prev => Math.max(prev, completedCount)); // Simple increment simulation
+        });
+
+        return () => unsubscribe();
     }, []);
 
     return (
@@ -95,12 +130,12 @@ export default function AgentDashboard() {
                 <div className="md:col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">Active Agents</CardTitle>
+                            <CardTitle className="text-sm font-medium">Active Campaigns</CardTitle>
                             <Cpu className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{activeAgents}</div>
-                            <p className="text-xs text-muted-foreground">+2 deployed in last hour</p>
+                            <div className="text-2xl font-bold">{activeCampaigns}</div>
+                            <p className="text-xs text-muted-foreground">Agents currently working</p>
                         </CardContent>
                     </Card>
                     <Card>
@@ -109,8 +144,8 @@ export default function AgentDashboard() {
                             <Zap className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{tasksProcessed.toLocaleString()}</div>
-                            <p className="text-xs text-muted-foreground">+12% from daily average</p>
+                            <div className="text-2xl font-bold">{completedCampaigns}</div>
+                            <p className="text-xs text-muted-foreground">Completed today</p>
                         </CardContent>
                     </Card>
                     <Card>
@@ -129,8 +164,8 @@ export default function AgentDashboard() {
                             <AlertCircle className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">3</div>
-                            <p className="text-xs text-muted-foreground">Requires human review</p>
+                            <div className="text-2xl font-bold">0</div>
+                            <p className="text-xs text-muted-foreground">System healthy</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -187,15 +222,22 @@ export default function AgentDashboard() {
                         <CardContent className="flex-1 p-0">
                             <ScrollArea className="h-[400px] px-4">
                                 <div className="space-y-4">
+                                    {logs.length === 0 && (
+                                        <div className="text-center text-muted-foreground py-10">
+                                            No active agents. Start a campaign to see activity.
+                                        </div>
+                                    )}
                                     {logs.map((log) => (
                                         <div key={log.id} className="flex items-start gap-3 pb-3 border-b last:border-0">
                                             <div className={`mt-1 p-1 rounded-full ${log.status === 'success' ? 'bg-green-100 text-green-600' :
                                                     log.status === 'warning' ? 'bg-yellow-100 text-yellow-600' :
-                                                        'bg-blue-100 text-blue-600'
+                                                        log.status === 'error' ? 'bg-red-100 text-red-600' :
+                                                            'bg-blue-100 text-blue-600'
                                                 }`}>
                                                 {log.status === 'success' ? <CheckCircle2 className="h-3 w-3" /> :
-                                                    log.status === 'warning' ? <AlertCircle className="h-3 w-3" /> :
-                                                        <Zap className="h-3 w-3" />}
+                                                    log.status === 'warning' ? <Zap className="h-3 w-3" /> :
+                                                        log.status === 'error' ? <AlertCircle className="h-3 w-3" /> :
+                                                            <Activity className="h-3 w-3" />}
                                             </div>
                                             <div className="space-y-1">
                                                 <p className="text-sm font-medium leading-none">{log.agent}</p>
